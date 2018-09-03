@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="ocurrence")
 public class Ocurrence {
@@ -20,6 +22,7 @@ public class Ocurrence {
 	@Column(name="n_end")
 	private Integer end;
 	
+	@JsonIgnore
 	@ManyToOne
 	private ChemicalCompoundSentence chemicalCompoundSentence;
 	
