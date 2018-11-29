@@ -11,60 +11,62 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
 @Entity
-public class Sentence implements LimtoxEntity {
+public class Section implements LimtoxEntity {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	
-	@Column(name = "sentenceId", nullable = false, length = 50, unique=true)
-	private String sentenceId;
+	@Column(name = "name", nullable = false, length = 250)
+	private String name;
 	
-	@Column(name = "n_order", nullable = false)
-	private Integer order;
+	@Column(name = "internalname", nullable = true, length = 100)
+	private String internalName;
 	
-	@Column(name = "text", nullable = false, length = 2000)
+	@Column(name = "text", nullable = true, length = 10000)
 	private String text;
 	
+	@Column(nullable = false)
 	private Integer speciesQuantity;
 	
+	@Column(nullable = false)
 	private Integer diseasesQuantity;
 	
+	@Column(nullable = false)
 	private Integer genesQuantity;
 	
+	@Column(nullable = false)
 	private Integer chemicalCompoundsQuantity;
-	
-	@OneToMany(cascade = CascadeType.ALL, 
-			mappedBy = "sentence", orphanRemoval = true)
-	private List<RelevantSentenceTopicInformation> relevantTopicsInformation = new ArrayList<RelevantSentenceTopicInformation>(); 
-	
-	@OneToMany(cascade = CascadeType.ALL, 
-			mappedBy = "sentence", orphanRemoval = true)
-	private List<EntityInstanceFound> entitiesInstanceFound = new  ArrayList<EntityInstanceFound>();
-	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "sentence", orphanRemoval = true)
-	private List<EntityAssociationSentence> entitiesAssociationsInstanceFound = new  ArrayList<EntityAssociationSentence>();
 	
 	@ManyToOne(optional=false)
 	@JsonIgnore
-	private Section section;
+	private Document document;
 	
-	public Sentence() {
+	@OneToMany(cascade = CascadeType.ALL, 
+			mappedBy = "section", orphanRemoval = true)
+	private List<RelevantSectionTopicInformation> relevantTopicsInformation = new ArrayList<RelevantSectionTopicInformation>();
+	
+	@OneToMany(cascade = CascadeType.ALL, 
+			mappedBy = "section", orphanRemoval = true)
+	private List<EntityInstanceFound> entitiesInstanceFound = new  ArrayList<EntityInstanceFound>();
+	
+	@OneToMany(cascade = CascadeType.ALL, 
+			mappedBy = "section", orphanRemoval = true)
+	private List<Sentence> sentences = new ArrayList<Sentence>();
+	
+	public Section() {
 		super();
 	}
 
-	public Sentence(String sentenceId, Integer order, String text) {
-		this.sentenceId = sentenceId;
-		this.order = order;
+	public Section(String name, String text) {
+		super();
+		this.name = name;
 		this.text = text;
 	}
-
 
 	public Integer getId() {
 		return id;
@@ -72,6 +74,22 @@ public class Sentence implements LimtoxEntity {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getInternalName() {
+		return internalName;
+	}
+
+	public void setInternalName(String internalName) {
+		this.internalName = internalName;
 	}
 
 	public String getText() {
@@ -82,41 +100,32 @@ public class Sentence implements LimtoxEntity {
 		this.text = text;
 	}
 
-	public Integer getOrder() {
-		return order;
-	}
-
-	public void setOrder(Integer order) {
-		this.order = order;
-	}
-
-	public String getSentenceId() {
-		return sentenceId;
-	}
-
-	public void setSentenceId(String sentenceId) {
-		this.sentenceId = sentenceId;
-	}
-
 	
-	public List<RelevantSentenceTopicInformation> getRelevantTopicsInformation() {
+	
+	public List<RelevantSectionTopicInformation> getRelevantTopicsInformation() {
 		return relevantTopicsInformation;
 	}
 
-	public void setRelevantTopicsInformation(List<RelevantSentenceTopicInformation> relevantTopicsInformation) {
+	public void setRelevantTopicsInformation(List<RelevantSectionTopicInformation> relevantTopicsInformation) {
 		this.relevantTopicsInformation = relevantTopicsInformation;
 	}
 
-	public Section getSection() {
-		return section;
+	public List<Sentence> getSentences() {
+		return sentences;
 	}
 
-	public void setSection(Section section) {
-		this.section = section;
+	public void setSentences(List<Sentence> sentences) {
+		this.sentences = sentences;
 	}
 
-	public void addRelevantTopicInformation(RelevantSentenceTopicInformation relevantSentenceTopicInformation) {
-		this.relevantTopicsInformation.add(relevantSentenceTopicInformation);
+	public void addRelevantTopicInformation(RelevantSectionTopicInformation relevantSectionTopicInformation) {
+		relevantTopicsInformation.add(relevantSectionTopicInformation);
+		
+	}
+
+	public void addSentence(Sentence sentence) {
+		sentences.add(sentence);
+		
 	}
 
 	public List<EntityInstanceFound> getEntitiesInstanceFound() {
@@ -131,27 +140,14 @@ public class Sentence implements LimtoxEntity {
 		entitiesInstanceFound.add(entityInstanceFound);
 		
 	}
-
+	
 	public RelevantTopicInformation getRelevantTopicsInformationByName(String topicName) {
-		for (RelevantSentenceTopicInformation relevantTopicInformation : relevantTopicsInformation) {
+		for (RelevantTopicInformation relevantTopicInformation : relevantTopicsInformation) {
 			if(relevantTopicInformation.getTopicName().equals(topicName)) {
 				return relevantTopicInformation;
 			}
 		}
 		return null;
-	}
-
-	public List<EntityAssociationSentence> getEntitiesAssociationsInstanceFound() {
-		return entitiesAssociationsInstanceFound;
-	}
-
-	public void setEntitiesAssociationsInstanceFound(List<EntityAssociationSentence> entitiesAssociationsInstanceFound) {
-		this.entitiesAssociationsInstanceFound = entitiesAssociationsInstanceFound;
-	}
-
-	public void addEntityAssociationInstanceFound(EntityAssociationSentence entityAssociationSentence) {
-		entitiesAssociationsInstanceFound.add(entityAssociationSentence);
-		
 	}
 
 	public Integer getSpeciesQuantity() {
@@ -186,11 +182,13 @@ public class Sentence implements LimtoxEntity {
 		this.chemicalCompoundsQuantity = chemicalCompoundsQuantity;
 	}
 
-	
+	public Document getDocument() {
+		return document;
+	}
 
-	
-	
-	
+	public void setDocument(Document document) {
+		this.document = document;
+	}
 	
 	
 	
